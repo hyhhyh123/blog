@@ -4,8 +4,8 @@
 window.BLOG_CONFIG = {
   // 站点信息
   title: "片刻",
-  subtitle: "hyhhyh001 的博客",
-  author: "hyhhyh001",
+  subtitle: "hyhhyh123 的博客",
+  author: "hyhhyh123",
   motto: "时光飞逝，斯人如风。",
   description: "记录生活、技术与日常碎片",
 
@@ -13,7 +13,7 @@ window.BLOG_CONFIG = {
   startDate: "2026-08-24",
 
   // 头像 URL（可改成你自己的图片地址）
-  avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=hyhhyh001",
+  avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=hyhhyh123",
 
   // 顶部横幅背景 URL（可改成你自己的图片地址）
   banner: "",
@@ -24,13 +24,13 @@ window.BLOG_CONFIG = {
   icp: "",
 
   // GitHub 公开仓库信息
-  githubUser: "hyhhyh001",
+  githubUser: "hyhhyh123",
   githubRepo: "blog",
   githubBranch: "main",
 
   // 社交链接（左侧 Follow Me）
   social: [
-    { name: "github", url: "https://github.com/hyhhyh001", icon: "GH" },
+    { name: "github", url: "https://github.com/hyhhyh123", icon: "GH" },
     { name: "twitter", url: "#", icon: "X" },
     { name: "weibo", url: "#", icon: "WB" },
     { name: "rss", url: "#", icon: "RSS" }

@@ -13,18 +13,18 @@
 ### 1. 准备 GitHub 账号
 
 - 注册/登录 [github.com](https://github.com)
-- 记住你的用户名，假设是 `hyhhyh001`
+- 记住你的用户名，假设是 `hyhhyh123`
 
 ### 2. 创建公开仓库
 
 - 点击右上角 `+` → `New repository`
-- Repository name 填 `blog`（也可以填 `hyhhyh001.github.io`，见下方说明）
+- Repository name 填 `blog`（也可以填 `hyhhyh123.github.io`，见下方说明）
 - 勾选 **Public**
 - 点击 **Create repository**
 
 ### 3. 上传本项目文件
 
-在新仓库页面点击 **uploading an existing file**，把 `D:\dev\blog-hyhhyh001` 里的这些文件拖进去：
+在新仓库页面点击 **uploading an existing file**，把 `D:\dev\blog-hyhhyh123` 里的这些文件拖进去：
 
 ```
 index.html
@@ -45,7 +45,7 @@ githubUser: "你的用户名",
 githubRepo: "blog",
 ```
 
-把 `hyhhyh001` 改成你的 GitHub 用户名。顺便把 `title`、`author`、`avatar` 等改成你的信息。
+把 `hyhhyh123` 改成你的 GitHub 用户名。顺便把 `title`、`author`、`avatar` 等改成你的信息。
 
 ### 5. 开启 GitHub Pages
 
@@ -57,10 +57,10 @@ githubRepo: "blog",
 **访问地址会是**：
 
 ```
-https://hyhhyh001.github.io/blog
+https://hyhhyh123.github.io/blog
 ```
 
-（如果你的仓库名是 `hyhhyh001.github.io`，则地址是 `https://hyhhyh001.github.io`）
+（如果你的仓库名是 `hyhhyh123.github.io`，则地址是 `https://hyhhyh123.github.io`）
 
 ## 发新文章
 
@@ -92,12 +92,12 @@ cover: images/photo.jpg
 ## 关于网址
 
 - 免费方案：`https://用户名.github.io/仓库名`
-- 想要 `https://hyhhyh001` 这种短域名，需要去域名商购买并绑定（一年约 60~90 元）
+- 想要 `https://hyhhyh123` 这种短域名，需要去域名商购买并绑定（一年约 60~90 元）
 
 ## 文件结构
 
 ```
-blog-hyhhyh001/
+blog-hyhhyh123/
 ├── index.html          # 博客主页
 ├── css/
 │   ├── style.css       # 主题样式
