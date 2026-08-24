@@ -347,6 +347,7 @@
     // 若项目里有 assets/taicongming.mp3（原曲），自动优先播放原曲
     this.audioEl = null;
     this.audioOk = false;
+    this.audioInUse = false;
     var self = this;
     try {
       var a = new Audio();
@@ -354,11 +355,27 @@
       a.loop = true;
       a.preload = "auto";
       a.volume = 0.55;
-      a.addEventListener("canplaythrough", function () { self.audioOk = true; });
+      a.addEventListener("canplaythrough", function () {
+        self.audioOk = true;
+        // 若当前正播放合成版，原曲就绪后无缝切换到原曲
+        if (self.playing && !self.audioInUse) self._useLocalAudio();
+      });
       a.addEventListener("error", function () { self.audioOk = false; });
       this.audioEl = a;
     } catch (e) { /* 忽略，继续用合成 */ }
   }
+
+  // 切换到原曲播放（停止合成）
+  BGM.prototype._useLocalAudio = function () {
+    if (!this.audioEl) return;
+    if (this.timerID) clearTimeout(this.timerID);
+    this.timerID = null;
+    if (this.ctx && this.ctx.state === "running") this.ctx.suspend();
+    this.audioInUse = true;
+    var self = this;
+    var p = this.audioEl.play();
+    if (p && p.catch) p.catch(function () { self.audioInUse = false; });
+  };
 
   BGM.prototype._init = function () {
     var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -433,8 +450,9 @@
     // 原曲文件可用时优先播放原曲
     if (this.audioEl && this.audioOk) {
       this.playing = true;
+      this.audioInUse = true;
       var p = this.audioEl.play();
-      if (p && p.catch) p.catch(function () { self.playing = false; });
+      if (p && p.catch) p.catch(function () { self.playing = false; self.audioInUse = false; });
       updateBgmUI(true);
       return;
     }
@@ -451,6 +469,7 @@
     this.playing = false;
     if (this.audioEl && this.audioOk) {
       this.audioEl.pause();
+      this.audioInUse = false;
       updateBgmUI(false);
       return;
     }
