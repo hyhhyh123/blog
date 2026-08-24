@@ -59,12 +59,12 @@ window.BLOG_CONFIG = {
     { title: "故事", cover: "#fff3e0", url: "#/" }
   ],
 
-  // 左侧菜单
+  // 左侧菜单：工作 / 生活 / 学习
   menu: [
     { icon: "🏠", label: "主页", url: "#/" },
-    { icon: "📅", label: "日常", url: "#/category/日常" },
-    { icon: "✨", label: "片刻", url: "#/category/片刻" },
-    { icon: "📁", label: "专题", url: "#/category/专题" },
+    { icon: "💼", label: "工作", url: "#/category/工作" },
+    { icon: "☕", label: "生活", url: "#/category/生活" },
+    { icon: "📚", label: "学习", url: "#/category/学习" },
     { icon: "🧑‍🤝‍🧑", label: "邻居", url: "#/" },
     { icon: "💬", label: "留言", url: "#/about" },
     { icon: "👤", label: "关于", url: "#/about" }

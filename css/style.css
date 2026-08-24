@@ -440,3 +440,44 @@ ul, li { margin: 0; padding: 0; list-style: none; }
   margin-bottom: 16px;
 }
 .hidden { display: none !important; }
+
+/* 背景音乐控制 */
+.bgm-control {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(129, 199, 132, 0.35);
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(46, 125, 50, 0.12);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--accent-dark);
+  transition: all 0.25s ease;
+  backdrop-filter: blur(6px);
+  user-select: none;
+}
+.bgm-control:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(46, 125, 50, 0.18);
+  background: #fff;
+}
+.bgm-control .bgm-icon {
+  font-size: 15px;
+  display: inline-block;
+}
+.bgm-control.playing .bgm-icon {
+  animation: bgm-pulse 1.4s ease-in-out infinite;
+}
+@keyframes bgm-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.18); opacity: 0.7; }
+}
+@media (max-width: 768px) {
+  .bgm-control { right: 14px; bottom: 14px; padding: 9px 12px; font-size: 12px; }
+}

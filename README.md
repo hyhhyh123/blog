@@ -82,7 +82,7 @@ https://hyhhyh123.github.io/blog
 ---
 title: 文章标题
 date: 2026-08-24
-category: 日常
+category: 生活
 tags: [生活, 随笔]
 cover: images/photo.jpg
 ---
@@ -98,6 +98,7 @@ cover: images/photo.jpg
 - 头像 / banner：`js/config.js` 里的 `avatar` 和 `banner` 改成你自己的图片 URL
 - 菜单 / 社交链接 / 右侧小工具：都在 `js/config.js` 里
 - 配色：修改 `css/style.css` 里的 CSS 变量 `--accent` 等
+- 背景音乐：页面右下角可切换。音乐由 Web Audio API 实时合成一段轻柔 Lo-fi 和弦循环，无需外部音频文件
 
 ## 关于网址
 

@@ -16,11 +16,11 @@
   var LOCAL_SAMPLE = [
     {
       file: "2026-08-24-第一篇博客.md",
-      content: "---\ntitle: 第一篇博客\ndate: 2026-08-24\ncategory: 日常\ntags: [生活, 随笔]\n---\n\n你好，欢迎来到我的博客！\n\n这是一篇**示例文章**，用于本地预览。当你把博客部署到 GitHub 后，这里会显示你仓库 `articles/` 目录下的真实文章。\n\n## 怎么发新文章\n\n1. 在 GitHub 仓库的 `articles/` 文件夹里新建一个 `.md` 文件\n2. 文件名格式：`2026-08-24-文章标题.md`\n3. 写好后首页自动出现这篇文章\n\n## 支持的格式\n\n- **加粗**、*斜体*、`行内代码`\n- 列表、表格、引用\n- 代码块自动高亮\n\n```javascript\nconsole.log('hello blog');\n```\n"
+      content: "---\ntitle: 第一篇博客\ndate: 2026-08-24\ncategory: 生活\ntags: [生活, 随笔]\n---\n\n你好，欢迎来到我的博客！\n\n这是一篇**示例文章**，用于本地预览。当你把博客部署到 GitHub 后，这里会显示你仓库 `articles/` 目录下的真实文章。\n\n## 怎么发新文章\n\n1. 在 GitHub 仓库的 `articles/` 文件夹里新建一个 `.md` 文件\n2. 文件名格式：`2026-08-24-文章标题.md`\n3. 写好后首页自动出现这篇文章\n\n## 支持的格式\n\n- **加粗**、*斜体*、`行内代码`\n- 列表、表格、引用\n- 代码块自动高亮\n\n```javascript\nconsole.log('hello blog');\n```\n"
     },
     {
       file: "2026-08-23-博客搭建记录.md",
-      content: "---\ntitle: 博客搭建记录\ndate: 2026-08-23\ncategory: 片刻\ntags: [Typecho, 博客]\ncover: \n---\n\n今天搭好了自己的博客，记录一下过程：\n\n- 用纯静态 HTML + Markdown，不依赖服务器\n- 文章托管在 GitHub 公开仓库\n- 网址通过 GitHub Pages 免费访问\n\n> 不用花一分钱，也能拥有自己的博客。\n"
+      content: "---\ntitle: 博客搭建记录\ndate: 2026-08-23\ncategory: 学习\ntags: [Typecho, 博客]\ncover: \n---\n\n今天搭好了自己的博客，记录一下过程：\n\n- 用纯静态 HTML + Markdown，不依赖服务器\n- 文章托管在 GitHub 公开仓库\n- 网址通过 GitHub Pages 免费访问\n\n> 不用花一分钱，也能拥有自己的博客。\n"
     }
   ];
 
@@ -320,6 +320,119 @@
     }
   }
 
+  // ---------- 背景音乐（Web Audio 合成轻音乐） ----------
+
+  function BGM() {
+    this.playing = false;
+    this.ctx = null;
+    this.nextNoteTime = 0;
+    this.timerID = null;
+    this.tempo = 58; // 慢速 BPM，慵懒氛围
+    // Cmaj7 / Fmaj7 / Em7 / Am7 — 舒缓和弦进行
+    this.notes = [
+      [261.63, 329.63, 392.00, 493.88], // Cmaj7
+      [349.23, 392.00, 466.16, 587.33], // Fmaj7
+      [329.63, 392.00, 493.88, 587.33], // Em7
+      [220.00, 261.63, 329.63, 392.00]  // Am7
+    ];
+    this.chordIdx = 0;
+    this.masterGain = null;
+  }
+
+  BGM.prototype._init = function () {
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return false;
+    this.ctx = new AudioContext();
+
+    this.masterGain = this.ctx.createGain();
+    this.masterGain.gain.value = 0.10;
+
+    // 延迟 + 反馈，营造轻微空间感
+    var delay = this.ctx.createDelay();
+    delay.delayTime.value = 0.28;
+    var feedback = this.ctx.createGain();
+    feedback.gain.value = 0.22;
+
+    this.masterGain.connect(this.ctx.destination);
+    this.masterGain.connect(delay);
+    delay.connect(feedback);
+    feedback.connect(delay);
+    feedback.connect(this.ctx.destination);
+
+    return true;
+  };
+
+  BGM.prototype._playChord = function (time, chord) {
+    if (!this.ctx) return;
+    var dur = 3.8;
+    var master = this.masterGain;
+    var ctx = this.ctx;
+    chord.forEach(function (freq) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      var filter = ctx.createBiquadFilter();
+
+      osc.type = "sine";
+      osc.frequency.value = freq;
+
+      filter.type = "lowpass";
+      filter.frequency.value = 900;
+
+      var now = time;
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.06, now + 1.2);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(master);
+
+      osc.start(time);
+      osc.stop(time + dur);
+    });
+  };
+
+  BGM.prototype._scheduler = function () {
+    if (!this.playing || !this.ctx) return;
+    while (this.nextNoteTime < this.ctx.currentTime + 0.2) {
+      this._playChord(this.nextNoteTime, this.notes[this.chordIdx]);
+      this.nextNoteTime += (60 / this.tempo) * 4; // 一小节
+      this.chordIdx = (this.chordIdx + 1) % this.notes.length;
+    }
+    var self = this;
+    this.timerID = setTimeout(function () { self._scheduler(); }, 120);
+  };
+
+  BGM.prototype.start = function () {
+    if (!this.ctx && !this._init()) return;
+    if (this.playing) return;
+    if (this.ctx.state === "suspended") this.ctx.resume();
+    this.nextNoteTime = this.ctx.currentTime + 0.05;
+    this.playing = true;
+    this._scheduler();
+    updateBgmUI(true);
+  };
+
+  BGM.prototype.stop = function () {
+    this.playing = false;
+    if (this.timerID) clearTimeout(this.timerID);
+    if (this.ctx && this.ctx.state === "running") this.ctx.suspend();
+    updateBgmUI(false);
+  };
+
+  BGM.prototype.toggle = function () {
+    if (this.playing) this.stop(); else this.start();
+  };
+
+  function updateBgmUI(playing) {
+    var el = document.getElementById("bgm-control");
+    var icon = el ? el.querySelector(".bgm-icon") : null;
+    var text = el ? el.querySelector(".bgm-text") : null;
+    if (el) el.classList.toggle("playing", playing);
+    if (icon) icon.textContent = playing ? "🎶" : "🎵";
+    if (text) text.textContent = playing ? "暂停" : "音乐";
+  }
+
   // ---------- 初始化 ----------
 
   function init() {
@@ -336,7 +449,7 @@
           file: fileName,
           title: parsed.fm.title || titleFromFile(fileName),
           date: parsed.fm.date || dateFromFile(fileName),
-          category: parsed.fm.category || "日常",
+          category: parsed.fm.category || "生活",
           tags: Array.isArray(parsed.fm.tags) ? parsed.fm.tags : [],
           cover: parsed.fm.cover || "",
           excerpt: excerpt(parsed.content)
@@ -355,6 +468,33 @@
     document.addEventListener("click", function (e) {
       if (!sidebar.contains(e.target) && e.target !== menuToggle) sidebar.classList.remove("open");
     });
+
+    // 背景音乐：自动尝试播放，浏览器阻止时等待用户第一次交互
+    var bgm = new BGM();
+    var bgmBtn = document.getElementById("bgm-control");
+    var autoStarted = false;
+    try {
+      bgm.start();
+      autoStarted = true;
+    } catch (e) {
+      autoStarted = false;
+    }
+    // 若自动播放被浏览器拦截，用户第一次点击页面任意位置时开启
+    function firstInteraction() {
+      if (!bgm.playing) bgm.start();
+      document.removeEventListener("click", firstInteraction);
+      document.removeEventListener("touchstart", firstInteraction);
+    }
+    if (!autoStarted) {
+      document.addEventListener("click", firstInteraction);
+      document.addEventListener("touchstart", firstInteraction);
+    }
+    if (bgmBtn) {
+      bgmBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        bgm.toggle();
+      });
+    }
   }
 
   init();
