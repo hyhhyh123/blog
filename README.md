@@ -1,6 +1,6 @@
 # 个人博客（Hank 风格）
 
-一个仿制 Typecho Hank 主题风格的纯静态博客：左侧固定边栏、中间 banner + 文章卡片、右侧小工具。文章用 Markdown 管理，托管在 GitHub 公开仓库，通过 GitHub Pages 免费访问。
+一个仿制 Typecho Hank 主题风格的纯静态博客：左侧固定边栏、中间 banner + 文章卡片、右侧小工具。文章用 Markdown 管理，托管在 GitHub 公开仓库，通过 GitHub Pages 免费访问。左侧导航分为工作、生活、学习三个栏目。
 
 ## 本地预览
 
@@ -119,6 +119,7 @@ blog-hyhhyh123/
 │   ├── marked.min.js   # Markdown 解析
 │   └── highlight.min.js# 代码高亮
 ├── articles/           # Markdown 文章
+│   ├── 2026-08-24-超声医疗.md
 │   ├── 2026-08-24-第一篇博客.md
 │   └── 2026-08-23-博客搭建记录.md
 ├── preview-server.js   # 本地预览服务器

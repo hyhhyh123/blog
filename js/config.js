@@ -7,7 +7,7 @@ window.BLOG_CONFIG = {
   subtitle: "hyhhyh123 的博客",
   author: "hyhhyh123",
   motto: "时光飞逝，斯人如风。",
-  description: "记录生活、技术与日常碎片",
+  description: "记录工作、生活与学习碎片",
 
   // 站点运行起始日（格式：YYYY-MM-DD），用于计算运行天数
   startDate: "2026-08-24",
