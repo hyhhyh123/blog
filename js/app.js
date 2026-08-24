@@ -320,23 +320,44 @@
     }
   }
 
-  // ---------- 背景音乐（Web Audio 合成轻音乐） ----------
+  // ---------- 背景音乐（《太聪明》和弦风格 Web Audio 合成 / 可选本地原曲） ----------
+
+  // 《太聪明》主歌走向（C 调）：C → Am → F → Fm → Em → A7 → F → G
+  // bass = 根音低音，arp = 吉他分解和弦音
+  var TAICONGMING_CHORDS = [
+    { bass: 130.81, arp: [261.63, 329.63, 392.00, 493.88] }, // C
+    { bass: 110.00, arp: [220.00, 261.63, 329.63, 392.00] }, // Am
+    { bass: 87.31,  arp: [174.61, 220.00, 261.63, 329.63] }, // F
+    { bass: 87.31,  arp: [174.61, 207.65, 261.63, 329.63] }, // Fm
+    { bass: 82.41,  arp: [164.81, 196.00, 246.94, 293.66] }, // Em
+    { bass: 110.00, arp: [220.00, 277.18, 329.63, 392.00] }, // A7
+    { bass: 87.31,  arp: [174.61, 220.00, 261.63, 329.63] }, // F
+    { bass: 98.00,  arp: [196.00, 246.94, 293.66, 392.00] }  // G
+  ];
 
   function BGM() {
     this.playing = false;
     this.ctx = null;
-    this.nextNoteTime = 0;
-    this.timerID = null;
-    this.tempo = 58; // 慢速 BPM，慵懒氛围
-    // Cmaj7 / Fmaj7 / Em7 / Am7 — 舒缓和弦进行
-    this.notes = [
-      [261.63, 329.63, 392.00, 493.88], // Cmaj7
-      [349.23, 392.00, 466.16, 587.33], // Fmaj7
-      [329.63, 392.00, 493.88, 587.33], // Em7
-      [220.00, 261.63, 329.63, 392.00]  // Am7
-    ];
-    this.chordIdx = 0;
     this.masterGain = null;
+    this.timerID = null;
+    this.nextTime = 0;
+    this.step = 0;   // 八分音符步进
+    this.tempo = 72; // 慵懒速度
+
+    // 若项目里有 assets/taicongming.mp3（原曲），自动优先播放原曲
+    this.audioEl = null;
+    this.audioOk = false;
+    var self = this;
+    try {
+      var a = new Audio();
+      a.src = "assets/taicongming.mp3";
+      a.loop = true;
+      a.preload = "auto";
+      a.volume = 0.55;
+      a.addEventListener("canplaythrough", function () { self.audioOk = true; });
+      a.addEventListener("error", function () { self.audioOk = false; });
+      this.audioEl = a;
+    } catch (e) { /* 忽略，继续用合成 */ }
   }
 
   BGM.prototype._init = function () {
@@ -345,13 +366,13 @@
     this.ctx = new AudioContext();
 
     this.masterGain = this.ctx.createGain();
-    this.masterGain.gain.value = 0.10;
+    this.masterGain.gain.value = 0.11;
 
     // 延迟 + 反馈，营造轻微空间感
     var delay = this.ctx.createDelay();
-    delay.delayTime.value = 0.28;
+    delay.delayTime.value = 0.30;
     var feedback = this.ctx.createGain();
-    feedback.gain.value = 0.22;
+    feedback.gain.value = 0.25;
 
     this.masterGain.connect(this.ctx.destination);
     this.masterGain.connect(delay);
@@ -362,52 +383,65 @@
     return true;
   };
 
-  BGM.prototype._playChord = function (time, chord) {
+  // 单个音符：正弦/三角波 + 低通 + 淡入淡出包络
+  BGM.prototype._note = function (time, freq, dur, vol, type) {
     if (!this.ctx) return;
-    var dur = 3.8;
-    var master = this.masterGain;
     var ctx = this.ctx;
-    chord.forEach(function (freq) {
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      var filter = ctx.createBiquadFilter();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    var filter = ctx.createBiquadFilter();
 
-      osc.type = "sine";
-      osc.frequency.value = freq;
+    osc.type = type || "sine";
+    osc.frequency.value = freq;
+    filter.type = "lowpass";
+    filter.frequency.value = 1300;
 
-      filter.type = "lowpass";
-      filter.frequency.value = 900;
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.exponentialRampToValueAtTime(vol, time + 0.025);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
 
-      var now = time;
-      gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(0.06, now + 1.2);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
 
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(master);
-
-      osc.start(time);
-      osc.stop(time + dur);
-    });
+    osc.start(time);
+    osc.stop(time + dur + 0.05);
   };
 
+  // 吉他式分解和弦：每小节低音 + 上下行琶音
   BGM.prototype._scheduler = function () {
     if (!this.playing || !this.ctx) return;
-    while (this.nextNoteTime < this.ctx.currentTime + 0.2) {
-      this._playChord(this.nextNoteTime, this.notes[this.chordIdx]);
-      this.nextNoteTime += (60 / this.tempo) * 4; // 一小节
-      this.chordIdx = (this.chordIdx + 1) % this.notes.length;
+    var spb = 60 / this.tempo / 2; // 一个八分音符时长（秒）
+    var seq = [0, 1, 2, 1, 3, 2, 1, 2]; // 琶音上下行音序
+    while (this.nextTime < this.ctx.currentTime + 0.3) {
+      var chord = TAICONGMING_CHORDS[Math.floor(this.step / 8) % TAICONGMING_CHORDS.length];
+      var idx = this.step % 8;
+      var t = this.nextTime;
+      if (idx === 0) {
+        this._note(t, chord.bass, spb * 6, 0.15, "sine"); // 小节首：低音长音
+      }
+      this._note(t, chord.arp[seq[idx]], spb * 1.5, 0.09, "triangle"); // 琶音
+      this.nextTime += spb;
+      this.step++;
     }
     var self = this;
-    this.timerID = setTimeout(function () { self._scheduler(); }, 120);
+    this.timerID = setTimeout(function () { self._scheduler(); }, 100);
   };
 
   BGM.prototype.start = function () {
+    var self = this;
+    // 原曲文件可用时优先播放原曲
+    if (this.audioEl && this.audioOk) {
+      this.playing = true;
+      var p = this.audioEl.play();
+      if (p && p.catch) p.catch(function () { self.playing = false; });
+      updateBgmUI(true);
+      return;
+    }
     if (!this.ctx && !this._init()) return;
     if (this.playing) return;
     if (this.ctx.state === "suspended") this.ctx.resume();
-    this.nextNoteTime = this.ctx.currentTime + 0.05;
+    this.nextTime = this.ctx.currentTime + 0.05;
     this.playing = true;
     this._scheduler();
     updateBgmUI(true);
@@ -415,6 +449,11 @@
 
   BGM.prototype.stop = function () {
     this.playing = false;
+    if (this.audioEl && this.audioOk) {
+      this.audioEl.pause();
+      updateBgmUI(false);
+      return;
+    }
     if (this.timerID) clearTimeout(this.timerID);
     if (this.ctx && this.ctx.state === "running") this.ctx.suspend();
     updateBgmUI(false);
