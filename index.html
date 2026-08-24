@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>片刻 - hyhhyh001 的博客</title>
+<meta name="description" content="记录生活、技术与日常碎片">
+<link rel="stylesheet" href="css/github.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page">
+
+  <!-- 左侧边栏 -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+      <a class="logo" href="#/">
+        <span class="logo-icon">P</span>
+        <span class="logo-text" id="site-title">片刻</span>
+      </a>
+
+      <nav class="menu" id="site-menu"></nav>
+
+      <div class="stat-box">
+        <div class="stat-item"><b id="stat-articles">0</b><span>文章</span></div>
+        <div class="stat-item"><b id="stat-cats">0</b><span>分类</span></div>
+        <div class="stat-item"><b id="stat-comments">0</b><span>留言</span></div>
+        <div class="stat-item"><b id="stat-days">0</b><span>运行</span></div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title">Follow Me</div>
+        <div class="social" id="social-links"></div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title">标签</div>
+        <div class="tag-cloud" id="tag-cloud"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 中间内容 -->
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-toggle" id="menu-toggle" aria-label="打开菜单">☰</button>
+      <span class="top-title" id="top-title">片刻</span>
+    </header>
+
+    <!-- Banner -->
+    <section class="banner" id="site-banner">
+      <div class="banner-cover"></div>
+      <div class="banner-info">
+        <img class="banner-avatar" id="banner-avatar" src="" alt="avatar">
+        <div>
+          <div class="banner-title" id="banner-title">片刻</div>
+          <div class="banner-motto" id="banner-motto">时光飞逝，斯人如风。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 视图：文章列表 -->
+    <section id="view-list">
+      <div class="filter" id="category-filter">
+        <button class="filter-btn active" data-cat="">全部</button>
+      </div>
+      <div class="article-list" id="article-list">
+        <div class="loading">正在加载文章...</div>
+      </div>
+    </section>
+
+    <!-- 视图：文章阅读 -->
+    <article id="view-article" class="hidden">
+      <div class="post-card">
+        <a class="back" href="#/">← 返回列表</a>
+        <div class="post-meta-head" id="post-meta-head"></div>
+        <h1 id="article-title" class="article-title"></h1>
+        <div class="article-body" id="article-body"></div>
+        <div class="article-foot"><a class="back" href="#/">← 返回列表</a></div>
+      </div>
+    </article>
+
+    <!-- 视图：关于 -->
+    <section id="view-about" class="hidden">
+      <div class="post-card">
+        <h2>关于我</h2>
+        <div class="article-body" id="about-body"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 右侧边栏 -->
+  <aside class="rightbar">
+    <div class="widget card quote-card">
+      <div class="widget-title">每日一言</div>
+      <img id="quote-cover" src="" alt="">
+      <p id="quote-text"></p>
+    </div>
+
+    <div class="widget card">
+      <div class="widget-title">About Me</div>
+      <ul class="about-list" id="about-list">
+        <li><span>📍</span> <span id="about-location"></span></li>
+        <li><span>💼</span> <span id="about-job"></span></li>
+        <li><span>🔗</span> <span id="about-github"></span></li>
+      </ul>
+    </div>
+
+    <div class="widget card">
+      <div class="widget-title">猜你喜欢</div>
+      <ul class="link-list" id="like-list"></ul>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title">专题页</div>
+      <div class="topic-list" id="topic-list"></div>
+    </div>
+  </aside>
+
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© <span id="foot-year"></span> <span id="foot-author"></span></span>
+    <span class="sep">·</span>
+    <span id="foot-icp"></span>
+    <span class="sep">·</span>
+    <span>由 GitHub Pages 免费托管</span>
+  </div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/marked.min.js"></script>
+<script src="js/highlight.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
